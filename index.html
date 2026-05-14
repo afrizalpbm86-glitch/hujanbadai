@@ -159,6 +159,9 @@
 <audio id="petir-audio">
   <source src="petir.wav" type="audio/mpeg">
 </audio>
+<audio id="lagu" loop>
+  <source src="lagu.mp3" type="audio/mpeg">
+</audio>
 
 <script>
   // 1. Bikin hujan visual
@@ -212,6 +215,11 @@
 
     petirAudio.volume = 0.5;
     playBtn.classList.add('hide');
+
+    // Tambahin ini buat play lagu
+  const laguAudio = document.getElementById('lagu');
+  laguAudio.volume = 0.6;  // atur volume 0.0 sampai 1.0
+  laguAudio.play();
 
     // Mulai kata-kata muncul
     tampilkanKata();
