@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buat Ayu</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0f;
+    font-family: 'Courier New', monospace;
+    height: 100vh;
+    overflow: hidden;
+    color: #00ff88;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+ .container {
+    text-align: center;
+    z-index: 2;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+  }
+
+ .foto-ayu {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #00ff88;
+    object-fit: cover;
+    margin-bottom: 25px;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+  }
+
+  /* Container kata-kata muncul dari tengah */
+ .kata-container {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+ .kata {
+    position: absolute;
+    font-size: 22px;
+    font-weight: 700;
+    color: #00ff88;
+    opacity: 0;
+    transform: scale(0.5);
+    animation: munculTengah 3s ease-out forwards;
+    text-align: center;
+    text-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+    padding: 0 10px;
+  }
+
+  @keyframes munculTengah {
+    0% { opacity: 0; transform: scale(0.5) translateY(20px); }
+    20% { opacity: 1; transform: scale(1.1) translateY(0); }
+    80% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.8) translateY(-20px); }
+  }
+
+  /* Efek Hujan */
+ .rain {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+ .drop {
+    position: absolute;
+    bottom: 100%;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(transparent, #00bfff);
+    animation: rain-fall linear infinite;
+  }
+
+  @keyframes rain-fall {
+    to { transform: translateY(110vh); }
+  }
+
+  /* Efek Petir */
+ .lightning {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  @keyframes flash {
+    0%, 100% { opacity: 0; }
+    1%, 3% { opacity: 0.7; }
+    2% { opacity: 0; }
+  }
+
+  /* Tombol Play */
+ .play-btn {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #00ff88;
+    color: #0a0a0f;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    transition: 0.3s;
+  }
+
+ .play-btn:active {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+
+ .play-btn.hide {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+   .kata { font-size: 18px; }
+   .foto-ayu { width: 100px; height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lightning" id="lightning"></div>
+<div class="rain" id="rain"></div>
+
+<button class="play-btn" id="playBtn">▶ Tap untuk Mulai</button>
+
+<div class="container">
+  <img src="ayu.jpg" alt="Ayu" class="foto-ayu">
+  <div class="kata-container" id="kataContainer"></div>
+</div>
+
+<!-- Audio -->
+<audio id="hujan" loop>
+  <source src="hujan.wav" type="audio/mpeg">
+</audio>
+<audio id="petir-audio">
+  <source src="petir.wav" type="audio/mpeg">
+</audio>
+
+<script>
+  // 1. Bikin hujan visual
+  const rainContainer = document.getElementById('rain');
+  for (let i = 0; i < 80; i++) {
+    const drop = document.createElement('div');
+    drop.classList.add('drop');
+    drop.style.left = Math.random() * 100 + 'vw';
+    drop.style.animationDuration = Math.random() * 0.5 + 0.7 + 's';
+    drop.style.animationDelay = Math.random() * 2 + 's';
+    rainContainer.appendChild(drop);
+  }
+
+  // 2. Daftar kata-kata yang mau muncul
+  const kataKata = [
+    "Ayu...",
+    "sudo apt install cinta kamu -y",
+    "Error 404: Mood nggak ketemu tanpa kamu",
+    "Bug di hatiku udah gue fix pake senyuman kamu",
+    "Kamu itu function utama di hidup gue",
+    "Password WiFi hatiku cuma kamu yang tau",
+    "Loop while true: mikirin kamu",
+    "Kamu NetCut Hati Ku",
+    "Ayu Kamu Telah ping Hati ku",
+    "Nama Mu OS Dalam Sistem Hati ku",
+    "Kamu itu Keybord Dan Aku Mouse",
+    "Ayu,kamu itu semicolon di akhir kode hidup gue"
+  ];
+
+  const container = document.getElementById('kataContainer');
+  let index = 0;
+
+  function tampilkanKata() {
+    container.innerHTML = '';
+    const kata = document.createElement('div');
+    kata.className = 'kata';
+    kata.textContent = kataKata[index];
+    container.appendChild(kata);
+    index = (index + 1) % kataKata.length;
+  }
+
+  // 3. Play audio + mulai efek saat tombol ditekan
+  const playBtn = document.getElementById('playBtn');
+  const hujanAudio = document.getElementById('hujan');
+  const petirAudio = document.getElementById('petir-audio');
+  const lightning = document.getElementById('lightning');
+
+  playBtn.addEventListener('click', () => {
+    hujanAudio.volume = 0.4;
+    hujanAudio.play();
+
+    petirAudio.volume = 0.5;
+    playBtn.classList.add('hide');
+
+    // Mulai kata-kata muncul
+    tampilkanKata();
+    setInterval(tampilkanKata, 3000);
+
+    // Mulai petir random
+    function triggerLightning() {
+      lightning.style.animation = 'flash 0.4s';
+      petirAudio.currentTime = 0;
+      petirAudio.play().catch(() => {});
+      setTimeout(() => lightning.style.animation = '', 400);
+      setTimeout(triggerLightning, Math.random() * 4000 + 4000);
+    }
+    setTimeout(triggerLightning, 2000);
+  });
+</script>
+
+</body>
+</html>
